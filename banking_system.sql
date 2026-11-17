@@ -1,32 +1,33 @@
-create database BANKING_SYSTEM;
-USE banking_system;
-CREATE table CUSTOMERS(
-CUSTOMERID int,
-FIRSTNAME varchar(50),
-LASTNAME varchar(50),
-EMAIL VARCHAR(50),
-PHONE varchar(10));
+CREATE DATABASE BANKING_SYSTEMDB; -- Created Database
+USE BANKING_SYSTEMDB; --  Accessed the database
 
-describe TABLE CUSTOMERS;
-describe CUSTOMERS;
+SHOW DATABASES; -- View the Database
+SHOW TABLES; -- View the tables in Database
+
+-- Creating the Tables 
+
+CREATE TABLE CUSTOMERS(  
+CUSTOMERID INT,
+FIRSTNAME VARCHAR(50),
+LASTNAME VARCHAR(50),
+EMAIL VARCHAR(100),
+PHONE VARCHAR(10));
+
+DESCRIBE TABLE CUSTOMERS;  -- Describing the table Customers
+DESCRIBE CUSTOMERS; -- Viewing the types and columns of table Customers
 
 SELECT * 
-from CUSTOMERS;
+FROM CUSTOMERS; -- viewing all rows and columns of table customers
 
 ALTER TABLE CUSTOMERS
-ADD COLUMN ACCOUNTCREATIONDATE DATE;  -- MODYFYING TABLE
+ADD COLUMN ACCOUNTCREATIONDATE DATE; -- modifying on the table using ALTER
 
-DESCRIBE CUSTOMERS;
-
-SELECT * 
-from CUSTOMERS; 
-
-CREATE TABLE ACCOUNT(
+CREATE TABLE ACCOUNTS(
 ACCOUNTID INT,
-ACCOUNTTYPE varchar(50),
+ACCOUNTTYPE VARCHAR(20),
 BALANCE DECIMAL(10,2));
 
-create TABLE TRANSACTIONS(
+CREATE TABLE TRANSACTIONS(
 TRANSACTIONID INT,
 TRANSACTIONDATE DATE,
 AMOUNT DECIMAL(10,2),
@@ -34,31 +35,28 @@ TRANSACTIONTYPE VARCHAR(20));
 
 CREATE TABLE BRANCHES(
 BRANCHID INT,
-BRANCHNAME varchar(100),
+BRANCHNAME VARCHAR(100),
 BRANCHADDRESS VARCHAR(255),
-BRANCHPHONE varchar(20));
+BRANCHPHONE VARCHAR(20));
 
-SELECT * 
-from transactions;
-
-SELECT * 
-from branches;
-
-create table accountbranches(
-ASSIGNDATE DATE);
+CREATE TABLE ACCOUNTBRANCHES(
+ASSIGNEDDATE DATE);
 
 CREATE TABLE LOANS(
-LOADID INT,
+LOANID INT,
 LOANAMOUNT DECIMAL(10,2),
-INTRESTRATE DECIMAL(5,2),
+INTERESTRATE DECIMAL(5,2),
 STARTDATE DATE,
 ENDDATE DATE);
 
-SHOW tables;
+SHOW TABLES;
+
+-- Final Modifications on Table
 
 ALTER TABLE CUSTOMERS
-DROP COLUMN  ACCOUNTCREATIONDATE; 
-SELECT  * 
+DROP COLUMN ACCOUNTCREATIONDATE;
+
+SELECT *
 FROM CUSTOMERS;
 
 ALTER TABLE CUSTOMERS
@@ -66,63 +64,63 @@ ADD COLUMN BIRTHDATE DATE;
 
 ALTER TABLE CUSTOMERS
 MODIFY PHONE VARCHAR(20),
-ADD primary key(CUSTOMERID);
+ADD PRIMARY KEY (CUSTOMERID);
 
 DESCRIBE CUSTOMERS;
 
 DROP TABLE ACCOUNTBRANCHES;
 
-use banking_system;
-select *
-from account;
+SELECT *
+FROM ACCOUNTS;
 
-alter table account
-add customerid int;
+ALTER TABLE ACCOUNTS
+ADD CUSTOMERID INT;
 
-alter table account
-add constraint
-foreign key(customerid)
-references customers(customerid);
+ALTER TABLE ACCOUNTS
+ADD CONSTRAINT
+FOREIGN KEY (CUSTOMERID)
+REFERENCES CUSTOMERS(CUSTOMERID);
 
-describe account;
+DESCRIBE ACCOUNTS;
 
-alter table account
-add primary key(accountid);
+ALTER TABLE ACCOUNTS
+ADD PRIMARY KEY (ACCOUNTID);
 
-alter table transactions
+ALTER TABLE TRANSACTIONS
 ADD ACCOUNTID INT,
-add constraint
-foreign key(accountid)
-references account(accountid);
+ADD CONSTRAINT
+FOREIGN KEY (ACCOUNTID)
+REFERENCES ACCOUNTS(ACCOUNTID);
 
-describe account;
-describe transactions;
+DESCRIBE ACCOUNTS;
+DESCRIBE TRANSACTIONS;
 
-alter table transactions
-add primary key(transactionid);
+ALTER TABLE TRANSACTIONS 
+ADD PRIMARY KEY (TRANSACTIONID);
 
-describe transactions;
-alter table branches
-add primary key(branchid);
+DESCRIBE TRANSACTIONS;
 
-alter table account
-add branchid int,
-add constraint
-foreign key(branchid)
-references branches(branchid);
+ALTER TABLE BRANCHES
+ADD PRIMARY KEY (BRANCHID);
 
-alter table loans
-add primary key(loadid),
-add customerid int,
-add constraint
-foreign key(customerid)
-references customers(customerid);
+ALTER TABLE ACCOUNTS
+ADD BRANCHID INT,
+ADD CONSTRAINT
+FOREIGN KEY (BRANCHID)
+REFERENCES BRANCHES(BRANCHID);
 
-alter table customers
-modify firstname varchar(50) not null,
-modify email varchar(50) unique;
+ALTER TABLE LOANS
+ADD PRIMARY KEY (LOANID),
+ADD CUSTOMERID INT,
+ADD CONSTRAINT
+FOREIGN KEY (CUSTOMERID)
+REFERENCES CUSTOMERS(CUSTOMERID);
 
-describe customers;
+ALTER TABLE CUSTOMERS
+MODIFY FIRSTNAME VARCHAR(50) NOT NULL,
+MODIFY EMAIL VARCHAR(100) UNIQUE;
+
+DESCRIBE CUSTOMERS;
 
 -- Adding Records inside the tables
 
@@ -202,4 +200,192 @@ SELECT *
 FROM TRANSACTIONS;
 
 SELECT * 
-FROM LOANS; 
+FROM LOANS;
+
+-- Updating and Deleting Records
+
+UPDATE CUSTOMERS
+SET PHONE = "4345667890"
+WHERE CUSTOMERID = 103; -- UPDATED A PHONE NUMBER
+
+DELETE FROM TRANSACTIONS
+WHERE TRANSACTIONID = 5008; -- DELETED A USELESS RECORD
+
+UPDATE ACCOUNTS
+SET BALANCE = 35750
+WHERE ACCOUNTID = 1007; -- UPDATED THE BALANCE 
+
+UPDATE TRANSACTIONS
+SET ACCOUNTID = 1003
+WHERE TRANSACTIONID IN (5006,5007); -- UPDATED MULTIPLE RECORDS
+
+-- EXTRACING THE DATA
+
+SELECT FIRSTNAME,EMAIL,CUSTOMERID
+FROM CUSTOMERS; 
+
+SELECT *
+FROM CUSTOMERS
+WHERE CUSTOMERID = 105; -- CALLING SPECIFIC DATA
+
+SELECT *
+FROM CUSTOMERS
+WHERE CUSTOMERID = 102 OR CUSTOMERID = 104; -- CALLING MULTIPLE ID'S
+
+SELECT *  -- CALLING DATA IN RANGE 
+FROM CUSTOMERS
+WHERE BIRTHDATE >= '1995-01-01' AND BIRTHDATE <= '2000-12-31';
+
+-- Customer Analysis
+
+-- How many customers are there?
+
+SELECT COUNT(*) AS Total_Customers -- Column Alises 
+FROM CUSTOMERS;
+
+-- Which customers have missing information?
+
+SELECT CUSTOMERID, FIRSTNAME AS NAME
+FROM CUSTOMERS
+WHERE LASTNAME IS NULL OR EMAIL IS NULL;
+
+-- Who are the youngest/oldest customers?
+
+SELECT
+MAX(BIRTHDATE) AS YOUNGEST_CUSTOMER,
+MIN(BIRTHDATE) AS OLDEST_CUSTOMER
+FROM CUSTOMERS;
+
+-- How many customers were born before/after a particular year?
+
+-- Before 2000
+
+SELECT * 
+FROM CUSTOMERS
+WHERE YEAR(BIRTHDATE) <= 2000;
+
+-- After 2000
+
+SELECT * 
+FROM CUSTOMERS
+WHERE YEAR(BIRTHDATE) > 2000;
+
+-- Which customers have multiple accounts?
+
+SELECT CUSTOMERID, COUNT(*) AS Total_Accounts
+FROM ACCOUNTS
+GROUP BY CUSTOMERID
+HAVING Total_Accounts > 1;
+
+-- ACCOUNT ANALYSIS
+
+-- How many Savings, Current and Salary accounts exist?
+
+SELECT ACCOUNTTYPE,COUNT(*) AS Total_Accounts
+FROM ACCOUNTS
+GROUP BY ACCOUNTTYPE;
+
+-- What is the total balance?
+
+SELECT SUM(BALANCE) Total_Balance
+FROM ACCOUNTS;
+
+-- What is the average account balance?
+
+SELECT AVG(BALANCE) Average_Balance
+FROM ACCOUNTS;
+
+-- Which customers have the highest balances?
+
+SELECT CUSTOMERID, BALANCE Highest_Balance
+FROM ACCOUNTS
+ORDER BY BALANCE DESC LIMIT 1;
+
+-- Which accounts have NULL balances?
+
+SELECT *
+FROM ACCOUNTS
+WHERE BALANCE=NULL;
+
+-- Which branch manages the most accounts?
+
+SELECT BRANCHID,COUNT(*) Total_Accounts
+FROM ACCOUNTS
+GROUP BY BRANCHID
+ORDER BY Total_Accounts DESC LIMIT 1;
+
+-- Transaction Analysis
+
+-- What is the total transaction amount?
+
+SELECT SUM(AMOUNT) Total_Transaction_Amount
+FROM TRANSACTIONS;
+
+-- How many deposits/withdrawals/transfers are there?
+
+SELECT TRANSACTIONTYPE, COUNT(*) Total_Transactions
+FROM TRANSACTIONS
+WHERE TRANSACTIONTYPE IN ('Deposit','Withdrawal','Transfer')
+GROUP BY TRANSACTIONTYPE;
+
+-- Which transaction type has the highest volume?
+
+SELECT TRANSACTIONTYPE,SUM(AMOUNT) Total_Amount
+FROM TRANSACTIONS
+GROUP BY TRANSACTIONTYPE
+ORDER BY Total_Amount DESC LIMIT 1;
+
+-- Which account has the highest transaction activity?
+SELECT ACCOUNTID,count(TRANSACTIONID) as total_transaction
+from transactions
+group by ACCOUNTID
+ORDER by total_transaction desc limit 1; 
+ -- average transaction amount
+ select avg(account) from transaction;
+ select *from transactions;
+ 
+ select * from transactions
+ where transactiondate is null or amount is null;
+ 
+ -- loan analysis
+ 
+ -- total loan amount
+ select sum(loanamount) total_loans
+ from loans;
+ 
+  -- which costomer has the largest loan?
+ select customerid ,sum(loanamount) as total_loan
+ from loans
+ group by customerid
+ order by total_loan desc limit 1;
+ 
+ -- which loan has the highest interest rate?
+ 
+ select max(interestrate) highest_interest_rate
+ from loans;
+ 
+ -- which loan are still active?
+ select * from loans;
+ 
+ select loanid from loans
+ where ENDDATE >= STARTDATE;
+ 
+ -- WHICH CUSTOMERS HAS MULTIPLE LOANS 
+ SELECT CUSTOMERID ,COUNT(LOANID) AS TOTAL_LOANS
+ FROM LOANS
+ GROUP BY CUSTOMERID
+ HAVING TOTAL_LOANS > 1;
+  
+-- AVG LOAN AMT 
+SELECT AVG(LOANAMOUNT) AS average_loan_amount
+from loans;
+
+-- branch analysis
+-- which branch has the most customers/accounts?
+
+-- branch with most accounts
+
+select brancname ,count(accountid) as total_account
+from branches 
+group by BRANCHNAME
+ORDER BY TOTAL_ACCOUNT DESC LIMIT 1; 
