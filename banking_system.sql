@@ -389,3 +389,21 @@ select brancname ,count(accountid) as total_account
 from branches 
 group by BRANCHNAME
 ORDER BY TOTAL_ACCOUNT DESC LIMIT 1; 
+
+ -- WHICH BRANCH HANDLES THE MOST TRANSACTIONS?
+ -- Account with max transactions
+ 
+ select accountid, count(*) total_transactions
+ from transactions
+ group by accountid
+ order by total_transaction desc limit 1;
+
+select branchname,count(transactionid) AS TOTAL_TRANSACTIONS
+FROM ACCOUNTS A 
+JOIN BRANCHES B 
+ON A.BRANCHID = B.BRANCHID
+JOIN TRANSACTIONS T 
+ON A.ACCOUNTID = T.ACCOUNTID
+GROUP BY BRANCHNAME 
+ORDER BY TOTAL_TRANSACTIONS DESC LIMIT 1; 
+
